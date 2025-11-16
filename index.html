@@ -16,125 +16,220 @@
       min-height: 100vh;
       align-items: center;
       justify-content: center;
-      background: #111827;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: #e5e7eb;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+      animation: pulse 15s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 0.3; }
     }
 
     .app {
-      background: #1f2937;
-      padding: 24px 28px;
-      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      padding: 32px 36px;
+      border-radius: 24px;
       max-width: 480px;
       width: 100%;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3),
+                  0 0 0 1px rgba(255,255,255,0.2);
+      position: relative;
+      z-index: 1;
     }
 
     h1 {
-      font-size: 1.2rem;
-      margin: 0 0 8px;
+      font-size: 1.4rem;
+      margin: 0 0 12px;
       text-align: center;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .phase {
       text-align: center;
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-      opacity: 0.8;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      opacity: 0.95;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
     .stats {
       text-align: center;
-      font-size: 0.8rem;
-      margin-bottom: 16px;
-      opacity: 0.7;
+      font-size: 0.85rem;
+      margin-bottom: 24px;
+      opacity: 0.85;
+      font-weight: 500;
+    }
+
+    .timer-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .progress-ring {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: rotate(-90deg);
+    }
+
+    .progress-ring-circle {
+      transition: stroke-dashoffset 0.5s ease;
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+    }
+
+    .progress-bg {
+      stroke: rgba(255, 255, 255, 0.15);
+    }
+
+    .progress-bar {
+      stroke: url(#gradient);
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
     }
 
     .time {
       text-align: center;
-      font-size: 3.5rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      margin: 8px 0 16px;
+      font-size: 4rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin: 0;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 1;
     }
 
     .controls {
       display: flex;
       justify-content: center;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 24px;
     }
 
     button {
       border: none;
       border-radius: 999px;
-      padding: 8px 16px;
-      font-size: 0.9rem;
+      padding: 12px 32px;
+      font-size: 1rem;
       cursor: pointer;
-      background: #10b981;
-      color: #022c22;
-      font-weight: 600;
-      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      font-weight: 700;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    button:hover::before {
+      transform: translateY(0);
     }
 
     button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.35);
-      background: #34d399;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
     }
 
     button.secondary {
-      background: #374151;
-      color: #e5e7eb;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.1) 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
     button.secondary:hover {
-      background: #4b5563;
+      background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.2) 100%);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     }
 
     fieldset {
-      border: 1px solid #374151;
-      border-radius: 12px;
-      padding: 12px 12px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 16px;
       margin: 0;
+      background: rgba(255, 255, 255, 0.05);
     }
 
     legend {
-      font-size: 0.85rem;
-      padding: 0 4px;
-      opacity: 0.9;
+      font-size: 0.9rem;
+      padding: 0 8px;
+      opacity: 1;
+      font-weight: 600;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px 12px;
-      margin-bottom: 8px;
+      gap: 12px 16px;
+      margin-bottom: 12px;
     }
 
     .field {
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      font-size: 0.8rem;
+      gap: 6px;
+      font-size: 0.85rem;
     }
 
     .field label {
-      opacity: 0.8;
+      opacity: 0.9;
+      font-weight: 500;
     }
 
     .field input {
-      border-radius: 999px;
-      border: 1px solid #4b5563;
-      padding: 4px 10px;
-      font-size: 0.85rem;
-      background: #111827;
-      color: #e5e7eb;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
       outline: none;
+      transition: all 0.3s ease;
     }
 
     .field input:focus {
       border-color: #10b981;
-      box-shadow: 0 0 0 1px rgba(16,185,129,0.4);
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+      background: rgba(255, 255, 255, 0.15);
     }
 
     .field-name {
@@ -142,37 +237,42 @@
     }
 
     .notice {
-      font-size: 0.7rem;
-      opacity: 0.6;
-      margin-top: 4px;
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-top: 8px;
+      line-height: 1.5;
     }
 
     .presets {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 6px;
-      margin-top: 4px;
-      font-size: 0.75rem;
+      gap: 8px;
+      margin-bottom: 12px;
+      margin-top: 8px;
+      font-size: 0.8rem;
       align-items: center;
     }
 
     .presets-label {
-      opacity: 0.7;
-      margin-right: 2px;
+      opacity: 0.85;
+      margin-right: 4px;
+      font-weight: 500;
     }
 
     .preset-btn {
-      padding: 4px 10px;
+      padding: 6px 14px;
       border-radius: 999px;
-      font-size: 0.75rem;
-      background: #111827;
-      color: #e5e7eb;
-      border: 1px solid #4b5563;
+      font-size: 0.8rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
     }
 
     .preset-btn:hover {
-      background: #374151;
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-1px);
     }
 
     @media (max-width: 520px) {
@@ -180,6 +280,13 @@
         border-radius: 0;
         min-height: 100vh;
         max-width: 100%;
+      }
+      .timer-container {
+        width: 240px;
+        height: 240px;
+      }
+      .time {
+        font-size: 3rem;
       }
     }
   </style>
@@ -190,7 +297,19 @@
     <div class="phase" id="phaseLabel">Fase: Lavoro</div>
     <div class="stats" id="statsLabel">Pomodori completati: 0</div>
 
-    <div class="time" id="timeDisplay">25:00</div>
+    <div class="timer-container">
+      <svg class="progress-ring" width="280" height="280">
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#34d399;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <circle class="progress-ring-circle progress-bg" cx="140" cy="140" r="130"></circle>
+        <circle class="progress-ring-circle progress-bar" id="progressBar" cx="140" cy="140" r="130"></circle>
+      </svg>
+      <div class="time" id="timeDisplay">25:00</div>
+    </div>
 
     <div class="controls">
       <button id="startPauseBtn">Avvia</button>
@@ -252,6 +371,7 @@
     const startPauseBtn = document.getElementById("startPauseBtn");
     const resetBtn = document.getElementById("resetBtn");
     const applyBtn = document.getElementById("applyBtn");
+    const progressBar = document.getElementById("progressBar");
 
     const timerNameInput = document.getElementById("timerName");
     const workInput = document.getElementById("workMinutes");
@@ -259,6 +379,12 @@
     const longBreakInput = document.getElementById("longBreakMinutes");
     const longBreakEveryInput = document.getElementById("longBreakEvery");
     const presetButtons = document.querySelectorAll("[data-preset]");
+
+    // Calcola la circonferenza del cerchio per la barra di progresso
+    const radius = 130;
+    const circumference = 2 * Math.PI * radius;
+    progressBar.style.strokeDasharray = circumference;
+    progressBar.style.strokeDashoffset = 0;
 
     // --- Audio (beep) ---
     let audioCtx = null;
@@ -399,6 +525,11 @@
       timeDisplayEl.textContent = formatTime(remainingSeconds);
 
       const totalPhaseSeconds = getPhaseTotalSeconds(currentPhase);
+
+      // Aggiorna la barra di progresso circolare
+      const progress = remainingSeconds / totalPhaseSeconds;
+      const offset = circumference * (1 - progress);
+      progressBar.style.strokeDashoffset = offset;
 
       if (isRunning) {
         startPauseBtn.textContent = "Pausa";
