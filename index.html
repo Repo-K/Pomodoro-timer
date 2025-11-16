@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Pomodoro Timer</title>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: light dark;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      background: #111827;
+      color: #e5e7eb;
+    }
+
+    .app {
+      background: #1f2937;
+      padding: 24px 28px;
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      margin: 0 0 8px;
+      text-align: center;
+    }
+
+    .phase {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+      opacity: 0.8;
+    }
+
+    .stats {
+      text-align: center;
+      font-size: 0.8rem;
+      margin-bottom: 16px;
+      opacity: 0.7;
+    }
+
+    .time {
+      text-align: center;
+      font-size: 3.5rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      margin: 8px 0 16px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: #10b981;
+      color: #022c22;
+      font-weight: 600;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.35);
+      background: #34d399;
+    }
+
+    button.secondary {
+      background: #374151;
+      color: #e5e7eb;
+    }
+
+    button.secondary:hover {
+      background: #4b5563;
+    }
+
+    fieldset {
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 12px 12px 8px;
+      margin: 0;
+    }
+
+    legend {
+      font-size: 0.85rem;
+      padding: 0 4px;
+      opacity: 0.9;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 12px;
+      margin-bottom: 8px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 0.8rem;
+    }
+
+    .field label {
+      opacity: 0.8;
+    }
+
+    .field input {
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      background: #111827;
+      color: #e5e7eb;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 1px rgba(16,185,129,0.4);
+    }
+
+    .field-name {
+      grid-column: 1 / -1;
+    }
+
+    .notice {
+      font-size: 0.7rem;
+      opacity: 0.6;
+      margin-top: 4px;
+    }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 6px;
+      margin-top: 4px;
+      font-size: 0.75rem;
+      align-items: center;
+    }
+
+    .presets-label {
+      opacity: 0.7;
+      margin-right: 2px;
+    }
+
+    .preset-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #111827;
+      color: #e5e7eb;
+      border: 1px solid #4b5563;
+    }
+
+    .preset-btn:hover {
+      background: #374151;
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        border-radius: 0;
+        min-height: 100vh;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1 id="title">Pomodoro Timer</h1>
+    <div class="phase" id="phaseLabel">Fase: Lavoro</div>
+    <div class="stats" id="statsLabel">Pomodori completati: 0</div>
+
+    <div class="time" id="timeDisplay">25:00</div>
+
+    <div class="controls">
+      <button id="startPauseBtn">Avvia</button>
+      <button id="resetBtn" class="secondary">Reset</button>
+    </div>
+
+    <fieldset>
+      <legend>Impostazioni</legend>
+
+      <div class="presets">
+        <span class="presets-label">Preset veloci:</span>
+        <button type="button" class="preset-btn" data-preset="classic">25/5 classico</button>
+        <button type="button" class="preset-btn" data-preset="deep">50/10 deep work</button>
+        <button type="button" class="preset-btn" data-preset="ultradian">90/20 ultradian</button>
+      </div>
+
+      <div class="grid">
+        <div class="field field-name">
+          <label for="timerName">Nome timer</label>
+          <input type="text" id="timerName" placeholder="Es. Lavoro mattina">
+        </div>
+
+        <div class="field">
+          <label for="workMinutes">Lavoro (minuti)</label>
+          <input type="number" id="workMinutes" min="1" value="25">
+        </div>
+
+        <div class="field">
+          <label for="shortBreakMinutes">Pausa breve (minuti)</label>
+          <input type="number" id="shortBreakMinutes" min="1" value="5">
+        </div>
+
+        <div class="field">
+          <label for="longBreakMinutes">Pausa lunga (minuti)</label>
+          <input type="number" id="longBreakMinutes" min="1" value="15">
+        </div>
+
+        <div class="field">
+          <label for="longBreakEvery">Pausa lunga ogni (pomodori)</label>
+          <input type="number" id="longBreakEvery" min="1" value="4">
+        </div>
+      </div>
+
+      <button id="applyBtn" class="secondary" style="width:100%; margin-top:4px;">Applica impostazioni</button>
+      <div class="notice">
+        Suggerimento: imposta i valori, premi "Applica impostazioni" e poi "Avvia".  
+        Il bottone ti permette di mettere in <strong>pausa</strong> e <strong>riprendere</strong>.  
+        Le impostazioni vengono salvate nel browser.
+      </div>
+    </fieldset>
+  </div>
+
+  <script>
+    // --- Elementi UI ---
+    const titleEl = document.getElementById("title");
+    const phaseLabelEl = document.getElementById("phaseLabel");
+    const statsLabelEl = document.getElementById("statsLabel");
+    const timeDisplayEl = document.getElementById("timeDisplay");
+    const startPauseBtn = document.getElementById("startPauseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const applyBtn = document.getElementById("applyBtn");
+
+    const timerNameInput = document.getElementById("timerName");
+    const workInput = document.getElementById("workMinutes");
+    const shortBreakInput = document.getElementById("shortBreakMinutes");
+    const longBreakInput = document.getElementById("longBreakMinutes");
+    const longBreakEveryInput = document.getElementById("longBreakEvery");
+    const presetButtons = document.querySelectorAll("[data-preset]");
+
+    // --- Audio (beep) ---
+    let audioCtx = null;
+    function ensureAudioContext() {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        if (!audioCtx) audioCtx = new AC();
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+      } catch (e) {
+        // niente audio, pace
+      }
+    }
+
+    function playBeep() {
+      try {
+        ensureAudioContext();
+        if (!audioCtx) return;
+
+        const duration = 0.3;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.value = 880; // A5
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.4, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.start(now);
+        osc.stop(now + duration);
+      } catch (e) {
+        // ignora errori audio
+      }
+    }
+
+    // --- Stato logico ---
+    const STORAGE_KEY = "pomodoroTimerSettingsV1";
+
+    let settings = {
+      name: "",
+      work: 25,
+      shortBreak: 5,
+      longBreak: 15,
+      longEvery: 4
+    };
+
+    let currentPhase = "work"; // "work" | "shortBreak" | "longBreak"
+    let remainingSeconds = settings.work * 60;
+    let intervalId = null;
+    let isRunning = false;
+    let pomodoroCount = 0;
+
+    // --- LocalStorage ---
+    function saveSettings() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+      } catch (e) {
+        // localStorage non disponibile
+      }
+    }
+
+    function loadSettingsFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const stored = JSON.parse(raw);
+        if (!stored || typeof stored !== "object") return;
+
+        if (typeof stored.name === "string") settings.name = stored.name;
+        if (Number.isFinite(stored.work)) settings.work = stored.work;
+        if (Number.isFinite(stored.shortBreak)) settings.shortBreak = stored.shortBreak;
+        if (Number.isFinite(stored.longBreak)) settings.longBreak = stored.longBreak;
+        if (Number.isFinite(stored.longEvery)) settings.longEvery = stored.longEvery;
+      } catch (e) {
+        // se ci sono problemi, ignora
+      }
+    }
+
+    function syncInputsFromSettings() {
+      timerNameInput.value = settings.name;
+      workInput.value = settings.work;
+      shortBreakInput.value = settings.shortBreak;
+      longBreakInput.value = settings.longBreak;
+      longBreakEveryInput.value = settings.longEvery;
+    }
+
+    // --- Funzioni helper ---
+    function readSettingsFromInputs() {
+      settings.name = timerNameInput.value.trim();
+      settings.work = parseInt(workInput.value, 10) || 25;
+      settings.shortBreak = parseInt(shortBreakInput.value, 10) || 5;
+      settings.longBreak = parseInt(longBreakInput.value, 10) || 15;
+      settings.longEvery = parseInt(longBreakEveryInput.value, 10) || 4;
+
+      if (settings.work <= 0) settings.work = 1;
+      if (settings.shortBreak <= 0) settings.shortBreak = 1;
+      if (settings.longBreak <= 0) settings.longBreak = 1;
+      if (settings.longEvery <= 0) settings.longEvery = 1;
+    }
+
+    function phaseToLabel(phase) {
+      switch (phase) {
+        case "work": return "Lavoro";
+        case "shortBreak": return "Pausa breve";
+        case "longBreak": return "Pausa lunga";
+        default: return "Sconosciuta";
+      }
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+    }
+
+    function getPhaseTotalSeconds(phase) {
+      if (phase === "work") return settings.work * 60;
+      if (phase === "shortBreak") return settings.shortBreak * 60;
+      if (phase === "longBreak") return settings.longBreak * 60;
+      return settings.work * 60;
+    }
+
+    function updateUI() {
+      const baseTitle = settings.name ? settings.name : "Pomodoro Timer";
+      const phaseLabel = phaseToLabel(currentPhase);
+
+      titleEl.textContent = baseTitle;
+      phaseLabelEl.textContent = "Fase: " + phaseLabel;
+      statsLabelEl.textContent = "Pomodori completati: " + pomodoroCount;
+      timeDisplayEl.textContent = formatTime(remainingSeconds);
+
+      const totalPhaseSeconds = getPhaseTotalSeconds(currentPhase);
+
+      if (isRunning) {
+        startPauseBtn.textContent = "Pausa";
+      } else {
+        if (remainingSeconds > 0 && remainingSeconds < totalPhaseSeconds) {
+          startPauseBtn.textContent = "Riprendi";
+        } else {
+          startPauseBtn.textContent = "Avvia";
+        }
+      }
+    }
+
+    function setPhase(phase) {
+      currentPhase = phase;
+      if (phase === "work") {
+        remainingSeconds = settings.work * 60;
+      } else if (phase === "shortBreak") {
+        remainingSeconds = settings.shortBreak * 60;
+      } else if (phase === "longBreak") {
+        remainingSeconds = settings.longBreak * 60;
+      }
+      updateUI();
+    }
+
+    function clearTimerInterval() {
+      if (intervalId !== null) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    }
+
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      updateUI();
+
+      intervalId = setInterval(() => {
+        remainingSeconds--;
+        if (remainingSeconds <= 0) {
+          remainingSeconds = 0;
+          updateUI();
+          clearTimerInterval();
+          isRunning = false;
+          playBeep(); // suono a fine fase
+          handlePhaseEnd();
+        } else {
+          updateUI();
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      isRunning = false;
+      clearTimerInterval();
+      updateUI();
+    }
+
+    function handlePhaseEnd() {
+      // Gestione logica ciclo Pomodoro
+      if (currentPhase === "work") {
+        pomodoroCount++;
+        const shouldLongBreak = pomodoroCount % settings.longEvery === 0;
+        if (shouldLongBreak) {
+          setPhase("longBreak");
+        } else {
+          setPhase("shortBreak");
+        }
+      } else {
+        // Da qualsiasi pausa si torna al lavoro
+        setPhase("work");
+      }
+
+      // Avvio automatico della fase successiva
+      startTimer();
+    }
+
+    function resetAll() {
+      clearTimerInterval();
+      isRunning = false;
+      pomodoroCount = 0;
+      setPhase("work");
+      updateUI();
+    }
+
+    function applyPreset(kind) {
+      clearTimerInterval();
+      isRunning = false;
+      pomodoroCount = 0;
+
+      if (kind === "classic") {
+        settings.work = 25;
+        settings.shortBreak = 5;
+        settings.longBreak = 15;
+        settings.longEvery = 4;
+        if (!settings.name) settings.name = "Classico 25/5";
+      } else if (kind === "deep") {
+        settings.work = 50;
+        settings.shortBreak = 10;
+        settings.longBreak = 20;
+        settings.longEvery = 3;
+        if (!settings.name) settings.name = "Deep work 50/10";
+      } else if (kind === "ultradian") {
+        settings.work = 90;
+        settings.shortBreak = 20;
+        settings.longBreak = 30;
+        settings.longEvery = 2;
+        if (!settings.name) settings.name = "Ciclo ultradiano";
+      }
+
+      syncInputsFromSettings();
+      saveSettings();
+      setPhase("work");
+    }
+
+    // --- Event listeners ---
+    startPauseBtn.addEventListener("click", () => {
+      if (isRunning) {
+        pauseTimer();
+      } else {
+        // Primo avvio dopo interazione utente: prepara l'audio
+        ensureAudioContext();
+
+        // Se il timer è a 0, riparte dalla fase corrente
+        if (remainingSeconds <= 0) {
+          setPhase(currentPhase);
+        }
+        startTimer();
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      resetAll();
+    });
+
+    applyBtn.addEventListener("click", () => {
+      const wasRunning = isRunning;
+      clearTimerInterval();
+      isRunning = false;
+
+      readSettingsFromInputs();
+      saveSettings();
+      setPhase("work");
+
+      if (wasRunning) {
+        startTimer();
+      } else {
+        updateUI();
+      }
+    });
+
+    presetButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const preset = btn.getAttribute("data-preset");
+        applyPreset(preset);
+      });
+    });
+
+    // Salva il nome al volo quando cambi
+    timerNameInput.addEventListener("blur", () => {
+      readSettingsFromInputs();
+      saveSettings();
+      updateUI();
+    });
+
+    // --- Inizializzazione ---
+    loadSettingsFromStorage();
+    syncInputsFromSettings();
+    remainingSeconds = settings.work * 60;
+    setPhase("work"); // questo chiama già updateUI
+  </script>
+</body>
+</html>
